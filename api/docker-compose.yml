@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres
+    container_name: tcc-postgres
+    environment:
+      POSTGRES_USER: tcc
+      POSTGRES_PASSWORD: tcc
+      POSTGRES_DB: tcc
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/data/postgres 
+    restart: always
+  
+  dynamodb:
+    image:  amazon/dynamodb-local
+    container_name: tcc-dynamo
+    hostname: dynamodb
+    restart: always
+    volumes:
+      -  ./my-dynamodb-data:/home/dynamodblocal/data
+    ports:
+      - 8000:8000
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: tcc-api
+    env_file: .env.docker
+    ports: 
+      - 4000:4000
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      - postgres
+    links:
+      - postgres
+
+volumes:
+  pgdata: 
+    driver: local
