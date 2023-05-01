@@ -16,10 +16,11 @@ class SQS {
     this.queueUrl = process.env.AWS_QUEUE_URL;
   }
 
-  sendMessage(message: any) {
+  sendMessage(message: any, groupId: string | undefined) {
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(message),
+      MessageGroupId: groupId,
     });
 
     return this.client.send(command);

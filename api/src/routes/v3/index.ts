@@ -46,7 +46,7 @@ router.post('/transactions', async (request, response) => {
 
   const transactionDao = await transactionPostgresDao.create(transaction);
 
-  SQS.sendMessage(transactionDao);
+  SQS.sendMessage(transactionDao, transactionDao.id);
 
   return response.status(201).json(transactionDao);
 });
