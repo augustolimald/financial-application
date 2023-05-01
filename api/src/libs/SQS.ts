@@ -21,6 +21,7 @@ class SQS {
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(message),
       MessageGroupId: groupId,
+      MessageDeduplicationId: groupId,
     });
 
     return this.client.send(command);
