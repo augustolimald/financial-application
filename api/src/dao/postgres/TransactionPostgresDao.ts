@@ -38,6 +38,10 @@ export class TransactionPostgresDao implements TransactionDao {
         transaction.user_id,
       ]);
 
+      await pool.query('UPDATE transactions SET processed_at = NOW() WHERE id = $1', [
+        transaction.id,
+      ]);
+
       await pool.query('COMMIT');
     } catch (error) {
       await pool.query('ROLLBACK');
