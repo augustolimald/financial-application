@@ -5,6 +5,7 @@ interface IUserCreation {
   name: string;
   email: string;
   password?: string;
+  balance?: number;
 }
 
 export class User {
@@ -12,11 +13,13 @@ export class User {
   name: string;
   email: string;
   password?: string;
+  balance?: number;
 
   constructor(data: IUserCreation) {
     this.name = data.name;
     this.email = data.email;
     this.password = data.password;
+    this.balance = data.balance;
 
     this.id = data.id || uuid();
   }

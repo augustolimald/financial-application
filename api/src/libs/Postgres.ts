@@ -1,7 +1,6 @@
-import { Client } from 'pg';
+import { Client, Pool } from 'pg';
 
 class Postgres {
-  private client: Client;
   private connectionString: string;
 
   constructor() {
@@ -10,6 +9,12 @@ class Postgres {
 
   getClient() {
     return new Client({
+      connectionString: this.connectionString,
+    });
+  }
+
+  getPool() {
+    return new Pool({
       connectionString: this.connectionString,
     });
   }

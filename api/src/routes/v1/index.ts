@@ -53,7 +53,7 @@ router.get('/balance', async (request, response) => {
 
   const balance = await transactionPostgresDao.sumByUser(user_id);
 
-  return response.status(200).json(balance);
+  return response.status(200).json({ balance });
 });
 
 export default router;
