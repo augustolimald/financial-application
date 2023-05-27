@@ -17,3 +17,5 @@ CREATE TABLE transactions (
 	created_at 		TIMESTAMP NOT NULL DEFAULT NOW(),
 	processed_at 	TIMESTAMP
 );
+
+SELECT AVG(EXTRACT(EPOCH FROM (processed_at - created_at))) AS difference FROM transactions;

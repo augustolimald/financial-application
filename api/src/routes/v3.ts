@@ -1,12 +1,11 @@
 import { Router } from 'express';
 
-import { SQS } from '../libs';
+import { Cache, SQS } from '../libs';
 import { Transaction } from '../model';
-import { UserPostgresDao, TransactionPostgresDao } from '../dao/postgres';
+import { TransactionPostgresDao } from '../dao/postgres';
 
 const router = Router();
 
-const userPostgresDao = new UserPostgresDao();
 const transactionPostgresDao = new TransactionPostgresDao();
 
 router.post('/transactions', async (request, response) => {
@@ -14,7 +13,17 @@ router.post('/transactions', async (request, response) => {
 
   const transactionDao = await transactionPostgresDao.create(transaction);
 
-  SQS.sendMessage(transactionDao, transactionDao.id);
+  //SQS.sendMessage(transactionDao, transactionDao.id);
+
+  const cacheKey = `cache:users:${transaction.user_id}:balance`;
+
+  let balance = await Cache.get(cacheKey);
+  if (!balance) {
+    balance = await transactionPostgresDao.sumByUser(transaction.user_id);
+  }
+
+  balance += transaction.value;
+  await Cache.set(cacheKey, balance);
 
   return response.status(201).json(transactionDao);
 });
@@ -22,7 +31,14 @@ router.post('/transactions', async (request, response) => {
 router.get('/balance', async (request, response) => {
   const { user_id } = request.body;
 
-  const balance = await userPostgresDao.getBalance(user_id);
+  const cacheKey = `cache:users:${user_id}:balance`;
+
+  let balance = await Cache.get(cacheKey);
+
+  if (!balance) {
+    balance = await transactionPostgresDao.sumByUser(user_id);
+    await Cache.set(cacheKey, balance);
+  }
 
   return response.status(200).json({ balance });
 });
