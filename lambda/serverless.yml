@@ -1,0 +1,34 @@
+# Welcome to serverless. Read the docs
+# https://serverless.com/framework/docs/
+
+# Serverless.yml is the configuration the CLI
+# uses to deploy your code to your provider of choice
+
+# The `service` block is the name of the service
+service: TransactionProcessorHandler
+
+frameworkVersion: '3'
+
+# The `provider` block defines where your service will be deployed
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:*" 
+      Resource: 
+        - "arn:aws:sqs:us-east-2:895713938250:*" 
+
+# The `functions` block defines what code to deploy
+functions:
+  processTransaction:
+    handler: handler.processTransaction
+    events:
+      - sqs:
+        arn: "arn:aws:sqs:us-east-2:895713938250:TransactionProcessor.fifo"
+        batchSize: 1
+        maximumBatchingWindow: 1
+        maximumConcurrency: 1
+        functionResponseType: "ReportBatchItemFailures"
