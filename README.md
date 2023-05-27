@@ -5,6 +5,7 @@ O objetivo desse repositório é demonstrar maneiras escaláveis de calcular sal
 Para isso, foi desenvolvido uma API Rest em Node.JS com três abordagens e foi hospedado na AWS.
 
 Em cima dessa API, foi rodado uma suíte de testes de carga, coletado as métricas e foram plotadas usando Python.
+
 ---
 ## Desenvolvimento
 
@@ -51,6 +52,7 @@ A terceira abordagem utiliza de processamento assíncrono e cache para conseguir
 A principal vantagem dessa abordagem é possibilitar a expansão de funcionalidades sem acrescentar ao tempo de execução. Se a aplicação recebesse novas funcionalidades de notificação ao celular e por email, por exemplo, bastaria que novas filas e módulos escutassem essa mensagem e processassem assíncronamente. As filas podem ter DLQs para mensagens que falham e podem ter controle de TPS e de ordem (Fifo), o que permite a aplicação escalar muito sem causar problemas.
 
 ![](./designs/Complete.png)
+
 ---
 
 ## Resultados
