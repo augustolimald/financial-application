@@ -1,0 +1,490 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API para aplicação financeira",
+    "title": "Financial Application",
+    "version": "1.0.0",
+    "contact": {
+      "email": "augustocesar827@gmail.com"
+    }
+  },
+	"tags": [
+		{
+			"name": "Common Routes",
+			"description": "Rotas de criação de usuário e autenticação"
+		},
+		{
+			"name": "V1",
+			"description": "O cálculo do saldo é feito em tempo de execução"
+		},
+		{
+			"name": "V2",
+			"description": "O saldo é mantido em um campo do banco e atualizado a cada inserção"
+		},
+		{
+			"name": "V3",
+			"description": "O saldo é mantido em cache e atualizado assincronamente"
+		}
+	],
+  "paths": {
+    "/login": {
+			"post": {
+				"tags": ["Common Routes"],
+				"summary": "Login",
+				"description": "Realiza login no sistema.",
+				"operationId": "login",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
+									},
+									"password": {
+										"type": "string",
+										"format": "password"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Login realizado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Login"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/WrongInfoError"
+					}
+				}
+			}
+    },
+
+		"/users": {
+			"post": {
+				"tags": ["Common Routes"],
+				"summary": "Cria Usuário",
+				"description": "Cria novo usuário",
+				"operationId": "createUser",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUser"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Usuário criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/WrongInfoError"
+					},
+					"409": {
+						"$ref": "#/components/responses/ConflictError"
+					}
+				}
+			}
+		},
+
+		"/v1/transactions": {
+			"post": {
+				"tags": ["V1"],
+				"summary": "Cria transação",
+				"description": "Cria transação para o usuário logado",
+				"operationId": "createTransaction",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTransaction"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Transação criada com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/WrongInfoError"
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		},
+
+		"/v1/balance": {
+			"get": {
+				"tags": ["V1"],
+				"summary": "Retorna o saldo do usuário",
+				"description": "Retorna o saldo do usuário",
+				"operationId": "getBalance",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"responses": {
+					"200": {
+						"description": "Saldo do usuário retornado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Balance"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		},
+
+		"/v2/transactions": {
+			"post": {
+				"tags": ["V2"],
+				"summary": "Cria transação",
+				"description": "Cria transação para o usuário logado",
+				"operationId": "createTransaction",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTransaction"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Transação criada com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/WrongInfoError"
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		},
+
+		"/v2/balance": {
+			"get": {
+				"tags": ["V2"],
+				"summary": "Retorna o saldo do usuário",
+				"description": "Retorna o saldo do usuário",
+				"operationId": "getBalance",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"responses": {
+					"200": {
+						"description": "Saldo do usuário retornado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Balance"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		},
+
+		"/v3/transactions": {
+			"post": {
+				"tags": ["V3"],
+				"summary": "Cria transação",
+				"description": "Cria transação para o usuário logado",
+				"operationId": "createTransaction",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTransaction"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Transação criada com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/WrongInfoError"
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		},
+
+		"/v3/balance": {
+			"get": {
+				"tags": ["V3"],
+				"summary": "Retorna o saldo do usuário",
+				"description": "Retorna o saldo do usuário",
+				"operationId": "getBalance",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"responses": {
+					"200": {
+						"description": "Saldo do usuário retornado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Balance"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/UnauthorizedError"
+					}
+				}
+			}
+		}
+	},
+
+  "components": {
+    "schemas": {
+			"Login": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"format": "uuid",
+						"example": "8cd5889e-7b9d-4729-87af-8b1b72569f4a"
+					},
+          "name": {
+						"type": "string",
+						"example": "Fulano"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "fulano@mail.com"
+					},
+					"token": {
+						"type": "string",
+						"format": "jwt",
+						"example": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjhjZDU4ODllLTdiOWQtNDcyOS04N2FmLThiMWI3MjU2OWY0YSIsImVtYWlsIjoidGVzdEBtYWlsLmNvbSIsIm5hbWUiOiJUZXN0In0.up9CH9ojGV_3ACHaPcmwDYvoHIYDW4HiGPbeIeMfn1E"
+					}
+				}
+			},
+			"CreateUser": {
+				"type": "object",
+        "properties": {
+          "name": {
+						"type": "string",
+						"example": "Fulano"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "fulano@mail.com"
+					},
+					"password": {
+						"type": "string",
+						"format": "password",
+						"example": "12345678"
+				 	}
+        }
+			},
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+						"type": "string",
+						"format": "uuid",
+						"example": "8cd5889e-7b9d-4729-87af-8b1b72569f4a"
+					},
+          "name": {
+						"type": "string",
+						"example": "Fulano"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "fulano@mail.com"
+					}
+        }
+      },
+			"CreateTransaction": {
+				"type": "object",
+				"properties": {
+					"description": {
+						"type": "string",
+						"example": "Pagamento de Aluguel"
+					},
+					"value": {
+						"type": "number",
+						"example": -1000
+					}
+				}
+			},
+			"Transaction": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"format": "uuid",
+						"example": "b6bcafba-ab07-4db9-938b-5c6afa7abaeb"
+					},
+					"user_id": {
+						"type": "string",
+						"format": "uuid",
+						"example": "8cd5889e-7b9d-4729-87af-8b1b72569f4a"
+					},
+					"description": {
+						"type": "string",
+						"example": "Pagamento de Aluguel"
+					},
+					"value": {
+						"type": "number",
+						"example": -1000
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date",
+						"example": "2023-05-01T13:37:29.684Z"
+					},
+					"processed_at": {
+						"type": "string",
+						"format": "date",
+						"example": "2023-05-01T13:37:31.684Z"
+					}
+				}
+			},
+			"Balance": {
+				"type": "object",
+				"properties": {
+					"balance": {
+						"type": "number",
+						"example": 2000
+					}
+				}
+			}
+    },
+    "responses": {
+      "WrongInfoError": {
+        "description": "Alguma informação não foi enviada corretamente",
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"message": {
+									"type": "string",
+									"example": "Erro de Validação"
+								},
+								"errors": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"value": {
+												"type": "string",
+												"example": "name"
+											},
+											"msg": {
+												"type": "string",
+												"example": "O campo name é obrigatório"
+											},
+											"param": {
+												"type": "string",
+												"example": "phone"
+											},
+											"location": {
+												"type": "string",
+												"example": "body"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+      },
+      "UnauthorizedError": {
+        "description": "Token inválido."
+      },
+      "ForbiddenError": {
+        "description": "Você não tem permissão para isso"
+      },
+      "NotFoundError": {
+        "description": "Informação não encontrada"
+      },
+			"ConflictError": {
+        "description": "Essa informação já existe em nossa base de dados"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -17,6 +17,7 @@
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
     "pg": "^8.10.0",
+    "swagger-ui-express": "^4.6.2",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
