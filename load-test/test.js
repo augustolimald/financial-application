@@ -3,7 +3,7 @@ import { check, sleep } from 'k6';
 
 const url = 'http://localhost:4000';
 
-const version = 'v1';
+const version = 'v3';
 
 function generateUser() {
 	const id = Math.random() * 100000000;
@@ -42,13 +42,13 @@ export default function () {
 	const userData = generateUser();
 
 	http.post(
-		`${url}/${version}/users`, 
+		`${url}/users`, 
 		JSON.stringify(userData), 
 		params
 	);
 
 	let response = http.post(
-		`${url}/${version}/login`,
+		`${url}/login`,
 		JSON.stringify({
 			email: userData.email,
 			password: userData.password
@@ -62,7 +62,7 @@ export default function () {
 
 	const requests = [];
 
-	for(let i = 0; i < 2000; i++) {
+	for(let i = 0; i < 50000; i++) {
 		const transaction = generateTransaction();
 
 		balance += transaction.value;
