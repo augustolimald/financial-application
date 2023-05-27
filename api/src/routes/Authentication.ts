@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import Token from '../libs/Token';
+
+import { Token } from '../libs';
 
 export async function Authentication(request: Request, response: Response, next: NextFunction) {
   const header = request.headers.authorization;
