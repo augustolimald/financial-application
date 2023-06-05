@@ -3,7 +3,7 @@ import { check, sleep } from 'k6';
 
 const url = 'http://localhost:4000';
 
-const version = 'v3';
+const version = 'v1';
 
 function generateUser() {
 	const id = Math.random() * 100000000;
@@ -88,7 +88,7 @@ export default function () {
 
 	http.batch(requests);
 
-	sleep(1);
+	sleep(2);
 
 	response = http.get(`${url}/${version}/balance`, params);
 

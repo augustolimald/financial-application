@@ -13,17 +13,7 @@ router.post('/transactions', async (request, response) => {
 
   const transactionDao = await transactionPostgresDao.create(transaction);
 
-  //SQS.sendMessage(transactionDao, transactionDao.id);
-
-  const cacheKey = `cache:users:${transaction.user_id}:balance`;
-
-  let balance = await Cache.get(cacheKey);
-  if (!balance) {
-    balance = await transactionPostgresDao.sumByUser(transaction.user_id);
-  }
-
-  balance += transaction.value;
-  await Cache.set(cacheKey, balance);
+  SQS.sendMessage(transactionDao, transactionDao.id);
 
   return response.status(201).json(transactionDao);
 });

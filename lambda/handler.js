@@ -18,48 +18,49 @@ module.exports.processTransaction = async (event, context) => {
   await postgresClient.connect();
 
   const redisClient = new Redis(redisUrl);
-  
-  await Promise.all(
-    Records.map(async (record) => {
-      const data = JSON.parse(record.body);
 
-      transactions.push(data.id);
+  for (let record in Records) {
+    const data = JSON.parse(record.body);
+
+    transactions.push(data.id);
+    
+    console.log(`Processing transaction ${data.id} for user ${data.user_id} (transactionId=${data.id})`);
+
+    const cacheKey = `cache:users:${data.user_id}:balance`;
+    
+    console.log(`Consulting Redis for key: '${cacheKey}' (transactionId=${data.id})`)
+
+    let balance = 0;
+    
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      console.log(`Found in cache (transactionId=${data.id})`)
       
-      console.log(`Processing transaction ${data.id} for user ${data.user_id} (transactionId=${data.id})`);
+      balance = JSON.parse(cached);
+      balance += data.value;
+    } else {
+      console.log(`Not found in cache, consulting Postgres database (transactionId=${data.id})`)
 
-      const cacheKey = `cache:users:${data.user_id}:balance`;
-      
-      console.log(`Consulting Redis for key: '${cacheKey}' (transactionId=${data.id})`)
+      const query = await postgresClient.query(
+        'SELECT COALESCE(SUM(value),0) AS total_value FROM transactions WHERE user_id = $1;', 
+        [data.user_id]
+      );
 
-      let balance = 0;
-      
-      const cached = await redisClient.get(cacheKey);
-      if (cached) {
-        console.log(`Found in cache (transactionId=${data.id})`)
-        balance = JSON.parse(cached);
-      } else {
-        console.log(`Not found in cache, consulting Postgres database (transactionId=${data.id})`)
-
-        const query = await postgresClient.query(
-          'SELECT COALESCE(SUM(value),0) AS total_value FROM transactions WHERE user_id = $1;', 
-          [data.user_id]
-        );
-
-        if (query.rows.length === 0) {
-          console.error(`Not found in Postgres database for user ${data.user_id} (transactionId=${data.id})`);
-          throw new Error(`Not found in Postgres database for user ${data.user_id}`);
-        }
-
-        balance = response.rows[0].total_value;
+      if (query.rows.length === 0) {
+        console.error(`Not found in Postgres database for user ${data.user_id} (transactionId=${data.id})`);
+        throw new Error(`Not found in Postgres database for user ${data.user_id}`);
       }
 
-      balance += data.value;
+      console.log(`Found in Postgres database for user ${data.user_id} (transactionId=${data.id})`);
 
-      await redisClient.set(cacheKey, JSON.stringify(balance));
+      balance = response.rows[0].total_value;
+    }
 
-      await postgresClient.query('UPDATE transactions SET processed_at = NOW() WHERE id = $1', [data.id]);
-    })
-  );
+    console.log(`Saving updated value in cache (transactionId=${data.id})`);
+    await redisClient.set(cacheKey, JSON.stringify(balance));
+
+    await postgresClient.query('UPDATE transactions SET processed_at = NOW() WHERE id = $1', [data.id]);
+  }
   
   postgresClient.end();
   redisClient.disconnect();
