@@ -3,11 +3,11 @@
 ## Database
 ![](./Database.png)
 
-## V1
-![](./V1.png)
+## Abordagem 1
+![](./A1.png)
 
-## V2
-![](./V2.png)
+## Abordagem 2
+![](./A2.png)
 
-## V3
-![](./V3.png)
+## Abordagem 3
+![](./A3.png)

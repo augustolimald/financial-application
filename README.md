@@ -36,19 +36,19 @@ O resultados dos testes foi salvo no Google Drive e a tratativa das métricas fo
 
 ---
 ## Abordagens
-### V1 - Cálculo Síncrono em Momento de Requisição
+### A1 - Cálculo Síncrono em Momento de Requisição
 A primeira abordagem é a mais simples e mais direta. Toda vez que um usuário solicita seu saldo, é rodado uma query no banco de dados que retorna a soma de todas suas transações.
 
-![](./designs/V1.png)
-### V2 - Cálculo Síncrono com Saldo Armazenado
+![](./designs/A1.png)
+### A2 - Cálculo Síncrono com Saldo Armazenado
 A segunda abordagem não atende as regras de normalização de banco de dados, em vista de conseguir um melhor tempo de leitura. Toda vez que uma transação é criada, seu valor é somado a um campo no banco de dados. Quando um usuário solicitar seu saldo, seu valor já estará calculado.
 
-![](./designs/V2.png)
+![](./designs/A2.png)
 Apesar de conseguir um melhor tempo de leitura, o tempo de escrita é maior, visto que são necessários pelo menos duas querys ao banco de dados para inserir uma transação.
-### V3 - Cálculo Assíncrono com Cache
+### A3 - Cálculo Assíncrono com Cache
 A terceira abordagem utiliza de processamento assíncrono e cache para conseguir melhores tempos de leitura, sem afetar consideravelmente o tempo de escrita. Toda vez que uma transação é criada, uma mensagem é enviada para outro módulo que fica responsável somente por atualizar o saldo. Quando um usuário solicitar seu saldo, seu valor já estará calculado e armazenado em cache, que possui um tempo de leitura muito menor que um banco de dados relacional.
 
-![](./designs/V3.png)
+![](./designs/A3.png)
 A principal vantagem dessa abordagem é possibilitar a expansão de funcionalidades sem acrescentar ao tempo de execução. Se a aplicação recebesse novas funcionalidades de notificação ao celular e por email, por exemplo, bastaria que novas filas e módulos escutassem essa mensagem e processassem assíncronamente. As filas podem ter DLQs para mensagens que falham e podem ter controle de TPS e de ordem (Fifo), o que permite a aplicação escalar muito sem causar problemas.
 
 ![](./designs/Complete.png)
