@@ -2,7 +2,7 @@
 
 Esse repositório foi desenvolvido como parte do trabalho de conclusão de curso de Sistemas de Informação na Universidade Federal de Lavras. Seu objetivo é demonstrar maneiras escaláveis para consultar atributos derivados em bancos de dados.
 
-Para isso, foi desenvolvido uma API Rest em Node.JS que permite a um usuário cadastrar transações financeiras e consultar seu saldo. Essa API calcula o saldo usando três abordagens, que foram submetidas a testes de carga para comparar sua performance.
+Para isso, foi desenvolvido uma API Rest em Node.JS que permite a um usuário cadastrar transações financeiras e consultar seu saldo. Como o saldo é um atributo derivado, pelas regras de normalização ele não deveria ser um atributo de uma tabela. Essa API calcula o saldo usando três abordagens, que foram submetidas a testes de carga para comparar sua performance.
 
 Toda a aplicação e testes foram realizados em ambiente AWS, para simular um ambiente real de produção e evitar alterações nos resultados devidos a alterações no ambiente local.
 
@@ -26,6 +26,7 @@ O modelo do banco de dados é o seguinte:
 ![](./designs/Database.png)
 
 Os testes de integração foram executados usando o [k6](https://k6.io/), simulando 10 mil transações. A cada transação criada pelo usuário, ele consultava seu saldo. O arquivo de saída mostra o tempo de requisição para cada requisição.
+
 ```
 k6 run test.js --out json=<filename>
 ```
@@ -63,6 +64,6 @@ A principal vantagem dessa abordagem é possibilitar a expansão de funcionalida
 
 ![](./results/GET.png)
 
-## Referências
+## Ferramentas
 
-- Designs - https://cacoo.com/diagrams/22Y1vQdEak76oOeM/EE1A6
+- Designs: https://cacoo.com/diagrams/22Y1vQdEak76oOeM/EE1A6
