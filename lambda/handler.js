@@ -1,7 +1,8 @@
 'use strict';
 
 const { Client } = require('pg');
-const { Redis } = require('ioredis');
+const Redlock = require('redlock');
+const RedisClient = require('ioredis');
 
 const postgresOptions = {
   connectionString: '<POSTGRES-URL>'
@@ -17,7 +18,11 @@ module.exports.processTransaction = async (event, context) => {
   const postgresClient = new Client(postgresOptions);
   await postgresClient.connect();
 
-  const redisClient = new Redis(redisUrl);
+  const redisClient = new RedisClient(redisUrl);
+  const redlock = new Redlock([this.redisClient], {
+    retryCount: 100,
+    retryDelay: 500,
+  });
 
   for (let record in Records) {
     const data = JSON.parse(record.body);
@@ -32,6 +37,8 @@ module.exports.processTransaction = async (event, context) => {
 
     let balance = 0;
     
+    const lock = await redlock.acquire([`locks:${cacheKey}`], 10000);
+  
     const cached = await redisClient.get(cacheKey);
     if (cached) {
       console.log(`Found in cache (transactionId=${data.id})`)
@@ -40,24 +47,26 @@ module.exports.processTransaction = async (event, context) => {
       balance += data.value;
     } else {
       console.log(`Not found in cache, consulting Postgres database (transactionId=${data.id})`)
-
+  
       const query = await postgresClient.query(
         'SELECT COALESCE(SUM(value),0) AS total_value FROM transactions WHERE user_id = $1;', 
         [data.user_id]
       );
-
+  
       if (query.rows.length === 0) {
         console.error(`Not found in Postgres database for user ${data.user_id} (transactionId=${data.id})`);
         throw new Error(`Not found in Postgres database for user ${data.user_id}`);
       }
-
+  
       console.log(`Found in Postgres database for user ${data.user_id} (transactionId=${data.id})`);
-
+  
       balance = response.rows[0].total_value;
     }
-
+  
     console.log(`Saving updated value in cache (transactionId=${data.id})`);
     await redisClient.set(cacheKey, JSON.stringify(balance));
+
+    await lock.release();
 
     await postgresClient.query('UPDATE transactions SET processed_at = NOW() WHERE id = $1', [data.id]);
   }

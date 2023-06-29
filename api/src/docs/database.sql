@@ -18,4 +18,5 @@ CREATE TABLE transactions (
 	processed_at 	TIMESTAMP
 );
 
-SELECT AVG(EXTRACT(EPOCH FROM (processed_at - created_at))) AS difference FROM transactions;
+-- Query processing time for version 3
+-- SELECT AVG(EXTRACT(EPOCH FROM (processed_at - created_at))) AS difference FROM transactions;
