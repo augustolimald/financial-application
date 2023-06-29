@@ -1,8 +1,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-const url = 'http://localhost:4000';
-
+const url = '<API URL>';
+const amount = 100;
 const version = 'v1';
 
 function generateUser() {
@@ -62,7 +62,7 @@ export default function () {
 
 	const requests = [];
 
-	for(let i = 0; i < 50000; i++) {
+	for(let i = 0; i < amount; i++) {
 		const transaction = generateTransaction();
 
 		balance += transaction.value;
@@ -88,7 +88,7 @@ export default function () {
 
 	http.batch(requests);
 
-	sleep(2);
+	sleep(5);
 
 	response = http.get(`${url}/${version}/balance`, params);
 
