@@ -60,8 +60,6 @@ export default function () {
 
 	let balance = 0;
 
-	const requests = [];
-
 	for(let i = 0; i < amount; i++) {
 		const transaction = generateTransaction();
 
@@ -71,24 +69,19 @@ export default function () {
 		Object.assign(options, params);
 		options.tags = {number: `${i}`};
 
-		requests.push([
-			'POST',
+		http.post(
 			`${url}/${version}/transactions`,
 			JSON.stringify(transaction),
 			options
-		]);
+		);
 
-		requests.push([
-			'GET',
+		http.get(
 			`${url}/${version}/balance`,
-			null,
 			options
-		]);
+		);
 	}
 
-	http.batch(requests);
-
-	sleep(5);
+	sleep(10);
 
 	response = http.get(`${url}/${version}/balance`, params);
 

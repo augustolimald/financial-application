@@ -1,8 +1,8 @@
 'use strict';
 
 const { Client } = require('pg');
-const Redlock = require('redlock');
 const RedisClient = require('ioredis');
+const { default: Redlock } = require('redlock');
 
 const postgresOptions = {
   connectionString: '<POSTGRES-URL>'
@@ -19,12 +19,12 @@ module.exports.processTransaction = async (event, context) => {
   await postgresClient.connect();
 
   const redisClient = new RedisClient(redisUrl);
-  const redlock = new Redlock([this.redisClient], {
+  const redlock = new Redlock([redisClient], {
     retryCount: 100,
     retryDelay: 500,
   });
 
-  for (let record in Records) {
+  for (let record of Records) {
     const data = JSON.parse(record.body);
 
     transactions.push(data.id);

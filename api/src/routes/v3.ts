@@ -32,7 +32,6 @@ router.get('/balance', async (request, response) => {
 
   if (!balance) {
     balance = await transactionPostgresDao.sumByUser(user_id);
-    //await Cache.set(cacheKey, balance);
   }
 
   return response.status(200).json({ balance });
