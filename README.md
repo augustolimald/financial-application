@@ -33,7 +33,7 @@ k6 run test.js --out json=<filename>
 
 O resultado dos testes foi salvo no Google Drive e a tratativa das métricas foi feita usando `numpy` e `matplotlib`, no notebook [FinancialApplication.ipynb](./results/FinancialApplication.ipynb) (via Google Colab).
 
-- [Resultados](https://drive.google.com/drive/folders/1ESyxlwE1yFEubLzu7r6yA98WM9SK-TlM?usp=sharing) (173Mb)
+- [Arquivos Brutos de Resultado](https://drive.google.com/drive/folders/1ESyxlwE1yFEubLzu7r6yA98WM9SK-TlM?usp=sharing)
 
 ---
 ## Abordagens
@@ -52,17 +52,18 @@ Apesar de conseguir um melhor tempo de leitura, o tempo de escrita é maior, vis
 A terceira abordagem utiliza de processamento assíncrono e cache para conseguir melhores tempos de leitura, sem afetar consideravelmente o tempo de escrita. Toda vez que uma transação é criada, uma mensagem é enviada para outro módulo que fica responsável somente por atualizar o saldo. Quando um usuário solicitar seu saldo, seu valor já estará calculado e armazenado em cache, que possui um tempo de leitura muito menor que um banco de dados relacional.
 
 ![](./designs/A3.png)
+
 A principal vantagem dessa abordagem é possibilitar a expansão de funcionalidades sem acrescentar ao tempo de execução. As filas podem ter DLQs para mensagens que falham e podem ter controle de TPS e de ordem (Fifo), o que permite a aplicação escalar muito sem causar problemas.
 
 ---
 
 ## Resultados
 
-![](./results/Requests.png)
-
 ![](./results/POST.png)
 
 ![](./results/GET.png)
+
+![](./results/Requests-10000.png)
 
 ## Ferramentas
 

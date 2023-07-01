@@ -6,8 +6,12 @@
 rtt min/avg/max/mdev = 0.445/0.481/0.560/0.036 ms
 ```
 
-![](./Requests.png)
-
 ![](./POST.png)
 
 ![](./GET.png)
+
+![](./Requests-100.png)
+
+![](./Requests-1000.png)
+
+![](./Requests-10000.png)
